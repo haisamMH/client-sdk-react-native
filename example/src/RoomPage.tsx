@@ -30,7 +30,8 @@ import {
 } from '@livekit/react-native-webrtc';
 import { startCallService, stopCallService } from './callservice/CallService';
 import Toast from 'react-native-toast-message';
-
+import RNCallKeep from 'react-native-callkeep';
+import InCallManager from 'react-native-incall-manager';
 import 'fastestsmallesttextencoderdecoder';
 
 export const RoomPage = ({
@@ -72,10 +73,12 @@ export const RoomPage = ({
       await room.connect(url, token, {});
       console.log('connected to ', url, ' ', token);
       setIsConnected(true);
+      InCallManager.setKeepScreenOn(true)
     };
 
     connect();
     return () => {
+      InCallManager.setKeepScreenOn(false)
       room.disconnect();
       AudioSession.stopAudioSession();
     };
@@ -212,6 +215,7 @@ export const RoomPage = ({
           room.simulateScenario(scenario);
         }}
         onDisconnectClick={() => {
+          RNCallKeep.endAllCalls()
           navigation.pop();
         }}
       />

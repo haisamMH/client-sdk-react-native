@@ -43,6 +43,9 @@ target 'LivekitReactNativeExample' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'RNCallKeep', :path => '../node_modules/react-native-callkeep'
+  pod 'ReactNativeIncallManager', :path => '../node_modules/react-native-incall-manager'
+
   pod 'livekit-react-native', :path => '../..'
 
   post_install do |installer|

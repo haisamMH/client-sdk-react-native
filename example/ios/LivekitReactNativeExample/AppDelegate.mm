@@ -1,6 +1,7 @@
 #import "AppDelegate.h"
 #import "LivekitReactNative.h"
 #import <React/RCTBundleURLProvider.h>
+#import "RNCallKeep.h"
 
 @implementation AppDelegate
 
@@ -11,6 +12,13 @@
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
+
+  [RNCallKeep setup:@{
+      @"appName": @"Vinix Live",
+      @"maximumCallGroups": @3,
+      @"maximumCallsPerCallGroup": @3,
+      @"supportsVideo": @YES,
+    }];
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
@@ -32,6 +40,15 @@
 - (BOOL)concurrentRootEnabled
 {
   return true;
+}
+
+- (BOOL)application:(UIApplication *)application
+ continueUserActivity:(NSUserActivity *)userActivity
+restorationHandler:(void(^)(NSArray<id<UIUserActivityRestoring>> * __nullable restorableObjects))restorationHandler
+ {
+   return [RNCallKeep application:application
+            continueUserActivity:userActivity
+              restorationHandler:restorationHandler];
 }
 
 @end

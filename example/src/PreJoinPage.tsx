@@ -2,12 +2,13 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { StyleSheet, View, TextInput, Text, Button } from 'react-native';
+import { StyleSheet, View, TextInput, Text, Button, Alert } from 'react-native';
 import type { RootStackParamList } from './App';
 import { useTheme } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const DEFAULT_URL = 'wss://www.example.com';
+import RNCallKeep from 'react-native-callkeep';
+import uuid from 'react-native-uuid';
+const DEFAULT_URL = 'wss://vinix-meet-np7o2s4i.livekit.cloud';
 const DEFAULT_TOKEN = '';
 
 const URL_KEY = 'url';
@@ -18,20 +19,57 @@ export const PreJoinPage = ({
 }: NativeStackScreenProps<RootStackParamList, 'PreJoinPage'>) => {
   const [url, setUrl] = useState(DEFAULT_URL);
   const [token, setToken] = useState(DEFAULT_TOKEN);
+  const [roomName, setRoomName] = useState('');
+  const [participantName, setParticipantName] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    AsyncStorage.getItem(URL_KEY).then((value) => {
-      if (value) {
-        setUrl(value);
-      }
-    });
+  // useEffect(() => {
+  //   AsyncStorage.getItem(URL_KEY).then((value) => {
+  //     if (value) {
+  //       setUrl(value);
+  //     }
+  //   });
 
-    AsyncStorage.getItem(TOKEN_KEY).then((value) => {
-      if (value) {
-        setToken(value);
-      }
-    });
-  }, []);
+  //   AsyncStorage.getItem(TOKEN_KEY).then((value) => {
+  //     if (value) {
+  //       setToken(value);
+  //     }
+  //   });
+  // }, []);
+
+  const getLiveKitToken = () => {
+    if (roomName && participantName) {
+      setLoading(true)
+      fetch(`https://kok028u4qf.execute-api.us-east-1.amazonaws.com/api2/getLivekitToken?roomName=${roomName}&participantName=${participantName}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.token) {
+            let callUUID = uuid.v4()
+            setToken(data.token);
+            setLoading(false)
+            RNCallKeep.startCall(
+              callUUID,
+              roomName,
+              participantName,
+              "generic",
+              true,
+            );
+            navigation.push('RoomPage', { url: url, token: data.token, callUUID });
+          }
+        }).catch(e => {
+          setLoading(false)
+          Alert.alert(
+            "Error",
+            "Please try later!"
+          );
+        });
+    }
+  }
+
+  const handleRoomName = (value: string) => {
+    console.log(value)
+    setRoomName(value.toLowerCase())
+  }
 
   const { colors } = useTheme();
 
@@ -41,38 +79,36 @@ export const PreJoinPage = ({
   };
   return (
     <View style={styles.container}>
-      <Text style={{ color: colors.text }}>URL</Text>
+      <Text style={{ color: colors.text }}>Room Name</Text>
       <TextInput
         style={{
           color: colors.text,
           borderColor: colors.border,
           ...styles.input,
         }}
-        onChangeText={setUrl}
-        value={url}
+        onChangeText={handleRoomName}
+        value={roomName}
       />
 
-      <Text style={{ color: colors.text }}>Token</Text>
+      <Text style={{ color: colors.text }}>Participant Name</Text>
       <TextInput
         style={{
           color: colors.text,
           borderColor: colors.border,
           ...styles.input,
         }}
-        onChangeText={setToken}
-        value={token}
+        onChangeText={setParticipantName}
+        value={participantName}
       />
 
       <Button
         title="Connect"
-        onPress={() => {
-          navigation.push('RoomPage', { url: url, token: token });
-        }}
+        onPress={getLiveKitToken}
       />
 
       <View style={styles.spacer} />
 
-      <Button
+      {/* <Button
         title="Save Values"
         onPress={() => {
           saveValues(url, token);
@@ -88,7 +124,7 @@ export const PreJoinPage = ({
           setUrl(DEFAULT_URL);
           setToken(DEFAULT_TOKEN);
         }}
-      />
+      /> */}
     </View>
   );
 };

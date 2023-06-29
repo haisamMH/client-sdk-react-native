@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.io.livekit.example.reactnative</string>
+		<string>group.vinixlive.broadcast</string>
 	</array>
 </dict>
 </plist>

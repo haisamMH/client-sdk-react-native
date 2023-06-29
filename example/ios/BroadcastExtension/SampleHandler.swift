@@ -8,11 +8,11 @@
 import ReplayKit
 import os.log
 
-let logger = OSLog(subsystem: "io.livekit.example.reactnative",
+let logger = OSLog(subsystem: "io.livekit.vinix.reactnative",
                    category: "Broadcaster")
 private enum Constants {
     // the App Group ID value that the app and the broadcast extension targets are setup with. It differs for each app.
-    static let appGroupIdentifier = "group.io.livekit.example.reactnative"
+    static let appGroupIdentifier = "group.vinixlive.broadcast"
 }
 
 class SampleHandler: RPBroadcastSampleHandler {
